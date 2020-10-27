@@ -68,25 +68,17 @@ class AscrisprController extends Controller
             $seq_postfix = substr($seq, -31);
         }
 
-//        if ($ref == "-"){
-//            $seq_postfix = substr($seq, -30);
-//        }elseif ($alt == "-"){
-//            $seq_postfix = substr($seq, -29);
-//        }else{
-//            $seq_postfix = substr($seq, -29);
-//        }
-
         $seq_out = $seq_prefix."[".$ref."/".$alt."]".$seq_postfix;
         return $seq_out;
     }
 
     private function getInputFile_dbsnp($upload_dir, $rs_id, $genome, $time_stamp)
     {
-        $software = '/var/www/ascrispr_backend/public/crisporWebsite-master/bin/Linux/twoBitToFa';
+        $software = '/software_path/twoBitToFa';
         if ($genome == "hg19"){
-            $refSeq = ' /var/www/ascrispr_backend/public/crisporWebsite-master/genomes/hg19/hg19.2bit ';
+            $refSeq = ' /software_path/hg19.2bit ';
         }else{
-            $refSeq = ' /var/www/ascrispr_backend/public/crisporWebsite-master/genomes/hg38/hg38.2bit ';
+            $refSeq = ' /software_path/hg38.2bit ';
         }
 
         if ($genome == "hg19"){
@@ -117,9 +109,6 @@ class AscrisprController extends Controller
                 $data1 = DBSNP38::where('start', '>', $start+1)->where('start', '<=', $end)->where('chr', $row['chr'])->get();
                 $dataResult1 = new DBSNP38Collection($data1);
             }
-
-//            $command_str = $software." -seq=".$chr." -start=".$start." -end=". $end.$refSeq.$outputFile;
-//            exec($command_str);
 
             foreach ($dataResult1 as $row1) {
                 $data_out[$i][$j]['chr'] = "chr".$row1['chr'];
@@ -159,7 +148,6 @@ class AscrisprController extends Controller
             $input_seq = $this->reform_fa_file($outputFile, $ref, $alt);
             $input_seq_org = $this->get_fa_file($outputFile);
 
-//             $info["seq_name"] = $rs_id.":".$chr."_".$start."_".$end.":[".$ref.">".$alt."]";
             $info["seq_name"] = $rs_id.":"."[".$ref.">".$alt."]";
             $info["input_seq"] = strtoupper($input_seq);
 
@@ -173,7 +161,6 @@ class AscrisprController extends Controller
             $info["rs_id"] = $row['rs_id'];
 
             $infos[] = $info;
-
         }
 
         $dbsnp_list_file = '/dbsnp_list_file.txt';
@@ -185,11 +172,11 @@ class AscrisprController extends Controller
 
     private function getInputFile_dbsnp_old($upload_dir, $rs_id, $genome, $time_stamp)
     {
-        $software = '/var/www/ascrispr_backend/public/crisporWebsite-master/bin/Linux/twoBitToFa';
+        $software = '/software_path/twoBitToFa';
         if ($genome == "hg19"){
-            $refSeq = ' /var/www/ascrispr_backend/public/crisporWebsite-master/genomes/hg19/hg19.2bit ';
+            $refSeq = ' /software_path/hg19.2bit ';
         }else{
-            $refSeq = ' /var/www/ascrispr_backend/public/crisporWebsite-master/genomes/hg38/hg38.2bit ';
+            $refSeq = ' /software_path/hg38.2bit ';
         }
 
         if ($genome == "hg19"){
@@ -259,7 +246,6 @@ class AscrisprController extends Controller
             $input_seq = $this->reform_fa_file($outputFile, $ref, $alt);
             $input_seq_org = $this->get_fa_file($outputFile);
 
-//             $info["seq_name"] = $rs_id.":".$chr."_".$start."_".$end.":[".$ref.">".$alt."]";
             $info["seq_name"] = $rs_id.":"."[".$ref.">".$alt."]";
             $info["input_seq"] = strtoupper($input_seq);
 
@@ -290,8 +276,6 @@ class AscrisprController extends Controller
         $upload_dir = public_path().'/uploads/'.$time_stamp;
         $dbsnp_list_file = '/dbsnp_list_file.txt';
 
-//        return $upload_dir.$dbsnp_list_file;
-
         if(file_exists($upload_dir.$dbsnp_list_file)) {
             $dbsnp_list_tmp = file_get_contents($upload_dir.$dbsnp_list_file);
         }
@@ -308,7 +292,6 @@ class AscrisprController extends Controller
         $rsID = $params['rsID'];
         $genome = $params['genome'];
 
-        //判断文件夹是否已存在
         if(!Storage::disk('uploads')->exists($time_stamp)){
             Storage::disk('uploads')->makeDirectory($time_stamp);
         }
@@ -371,7 +354,6 @@ class AscrisprController extends Controller
         }else{
             $table_seq = $params['table_seq'];
             $input_seqs = json_decode($table_seq,true);
-//            $input_seqs = $table_seq;
             $input_seq = '';
             for($i = 0; $i < count($input_seqs); $i++) {
                 $input_seq = strtoupper($input_seqs[$i]['input_seq']);
@@ -398,9 +380,9 @@ class AscrisprController extends Controller
                     $param1 = "-in $input_seq -out $out -strand all -input_types $input_types";
                 }
 
-                exec("perl /var/www/ascrispr_backend/public/bin/gh_ascrispr_str2fa.pl " . $param1 . " > " . "$upload_dir/gh_ascrispr_str2fa.log 2>&1");
+                exec("perl /ascrispr_backend/public/bin/gh_ascrispr_str2fa.pl " . $param1 . " > " . "$upload_dir/gh_ascrispr_str2fa.log 2>&1");
                 $log_file = $time_stamp.'/gh_ascrispr_str2fa_log.txt';
-                $cmd = "perl /var/www/ascrispr_backend/public/bin/gh_ascrispr_str2fa.pl " . $param1 . " > " . "$upload_dir/gh_ascrispr_str2fa.log 2>&1";
+                $cmd = "perl /ascrispr_backend/public/bin/gh_ascrispr_str2fa.pl " . $param1 . " > " . "$upload_dir/gh_ascrispr_str2fa.log 2>&1";
                 Storage::disk('uploads')->put($log_file, $cmd);
 
                 // crispor
@@ -416,9 +398,9 @@ class AscrisprController extends Controller
                     }else{
                         $param1 = "$genome $inputFile $outputFile1 -p $PAM1 --mm 3 ";
                     }
-                    exec("/conda/envs/python271/bin/python2.7 $main_path/crisporWebsite-master/crispor.py " . $param1 . " >> " . "$upload_dir/gh_crispor.log 2>&1");
+                    exec("python /software_path/crisporWebsite-master/crispor.py " . $param1 . " >> " . "$upload_dir/gh_crispor.log 2>&1");
                     $log_file = $time_stamp.'/crispor_log.txt';
-                    $cmd = "/conda/envs/python271/bin/python2.7 $main_path/crisporWebsite-master/crispor.py " . $param1 . " > " . "$upload_dir/gh_crispor.log 2>&1";
+                    $cmd = "python /software_path/crisporWebsite-master/crispor.py " . $param1 . " > " . "$upload_dir/gh_crispor.log 2>&1";
                     Storage::disk('uploads')->put($log_file, $cmd);
                 }
             }
@@ -430,7 +412,6 @@ class AscrisprController extends Controller
 
         $time_stamp = $request->input('params');
 
-        //判断文件夹是否已存在
         if(!Storage::disk('uploads')->exists($time_stamp)){
             Storage::disk('uploads')->makeDirectory($time_stamp);
         }
@@ -441,7 +422,6 @@ class AscrisprController extends Controller
         }
         $params = json_decode($params_tmp, true);
 
-//        $time_stamp = $params['time_stamp'];
         $cas9_system_types = $params['cas9_system_types'];
         $cpf1_system_types = $params['cpf1_system_types'];
         $cas12b_system_types = $params['cas12b_system_types'];
@@ -483,19 +463,11 @@ class AscrisprController extends Controller
             }
         }
 
-
         $data_out = [];
         for($i=0; $i<count($seqs_list);$i++) {
             $spacerSeq_TTTT_tip = '';
             $seq_name_hide = $seqs_list[$i]["seq_name"];
             $input_seq = $seqs_list[$i]["input_seq"];
-
-//                if ($input_types == "input_sequence") {
-//                    echo "<div class='col-md-12  col-md-pull-3'><h3><span class='label label-success'>Sequence: $input_seq</span></h3></div>";
-//                } else {
-//                    echo "<div class='col-md-12  col-md-pull-3'><h3><span class='label label-success'>dbSNP:$input_seq</span></h3></div>";
-//                }
-
             $resultsFile = $upload_dir . "/" . $seq_name_hide . ".results.txt";
 
             $data = $this -> read_data_file($resultsFile);
@@ -519,7 +491,6 @@ class AscrisprController extends Controller
                 $data_out[$i][$j]['MUTposEnd'] = '';
                 $data_out[$i][$j]['PAM_IUB'] = '';
                 $data_out[$i][$j]['seq_name_hide'] = '';
-
                 $data_out[$i][$j]['spacerSeq'] = '';
                 $data_out[$i][$j]['PAMSeq'] = '';
                 $data_out[$i][$j]['Crispr_Type'] = '';
@@ -589,7 +560,6 @@ class AscrisprController extends Controller
                 }
 
                 $str_for_link = "$PAMSeq:$Targeting_Strand:$Direction_link:$N1:$N2:$spacerStart:$spacerEnd:$PAMStart:$PAMEnd:$MUTposStart:$MUTposEnd:$crispr_system:$PAM_IUB:$time_stamp:$seq_name_hide";
-//                    $Enzyme_Information = "<a href='ascrispr/enzymeInformation/$spacerSeq/$PAM_original/$str_for_link' target='_blank'>$Enzyme_Information <span class='glyphicon glyphicon-new-window'></span></a>";
 
                 $isSNP_PAM = FALSE;
                 if ($Targeting_Strand == "Varied" || $Targeting_Strand == "Alternative") {
@@ -607,8 +577,7 @@ class AscrisprController extends Controller
                                 $isSNP_PAM = TRUE;
                             }
                         } else {
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在spacer上有四种情况，不可以合并为三种
+                            
                             if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $spacerStart + 1;
@@ -627,8 +596,6 @@ class AscrisprController extends Controller
                                 $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                             }
 
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在PAM上有四种情况，不可以合并为三种
                             if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $PAMStart + 1;
@@ -668,8 +635,6 @@ class AscrisprController extends Controller
                             }
                         } else {
 
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在spacer上有四种情况，不可以合并为三种
                             if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $spacerStart + 1;
@@ -688,8 +653,6 @@ class AscrisprController extends Controller
                                 $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                             }
 
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在PAM上有四种情况，不可以合并为三种
                             if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $PAMStart + 1;
@@ -736,8 +699,6 @@ class AscrisprController extends Controller
                                 $isSNP_PAM = TRUE;
                             }
                         } else {
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在spacer上有四种情况，不可以合并为三种
                             if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $spacerStart + 1;
@@ -755,8 +716,6 @@ class AscrisprController extends Controller
                                 $len = $spacerEnd - $spacerStart + 1;
                                 $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                             }
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在PAM上有四种情况，不可以合并为三种
                             if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $PAMStart + 1;
@@ -793,8 +752,6 @@ class AscrisprController extends Controller
                                 $isSNP_PAM = TRUE;
                             }
                         } else {
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在spacer上有四种情况，不可以合并为三种
                             if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $spacerStart + 1;
@@ -813,8 +770,6 @@ class AscrisprController extends Controller
                                 $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                             }
 
-                            # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                            # Mutation 在PAM上有四种情况，不可以合并为三种
                             if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                 $posStart = 0;
                                 $len = $MUTposEnd - $PAMStart + 1;
@@ -847,17 +802,12 @@ class AscrisprController extends Controller
                         }
                     }
                 }
-                # 判断  如果突变点在PAM上， type is N R ... 无法确保只切割一条链
-//                if ($Targeting_Strand == "Reference" || $Targeting_Strand == "WT") {
+
                     if (strlen($PAMSeq) > strlen($PAM_original)) {
                         if ($isSNP_PAM) {
                             if(strlen($N1)==1 && strlen($N2)==1){
                                 $PAM_IUB_letter = substr($PAM_IUB, $posStart, 1);
                                 $PAM_original_letter = substr($PAM_original, $posStart, 1);
-
-//                                $log_file = '/ascrisprByTimeStamp111.txt';
-//                                $cmd = $N1 . "\t" . $N2 . "\t" . $Direction . "\t" . $PAMSeq . "\t" . $PAM_original . "\t" . $PAM_IUB_letter . "\t" . $PAM_original_letter . "\t" . $PAM_IUB . "\t" . $PAM_original . "\t" . $posStart;
-//                                Storage::disk('uploads')->put($log_file, $cmd);
 
                                 if ($this->isMatched($PAM_IUB, $PAM_original, $posStart, $N1, $N2, $Direction)) {
                                     $log_file = '/ascrisprByTimeStamp.txt';
@@ -868,15 +818,13 @@ class AscrisprController extends Controller
                             }
                         }
                     }
-//                }
-                # TTTT 提示
+
+                # TTTT 
                 $spacerSeq_TTTT_tip = $this -> mark_pos_tttt($spacerSeq);
 
                 $seqId = $ele[22];
                 $guideId = $ele[23];
                 $targetSeq = $ele[24];
-
-//                    return $spacerSeq;
 
                 if($ele[25] != 'None'){
                     $mitSpecScore = $ele[25] / 100;
@@ -926,7 +874,6 @@ class AscrisprController extends Controller
                     $mismatchCount_num_str = '-';
                 }
 
-
                 $Xu_Score = '--';
                 $Doench16_Score = '--';
                 $Moreno_Mateos_Score = '--';
@@ -974,9 +921,8 @@ class AscrisprController extends Controller
                         }
 
                         $Najm2018 = '--';
-
                         $targetGenomeGeneLocusTmp = str_replace(PHP_EOL, '', $ele[39]);
-                        // #seqId guideId targetSeq mitSpecScore offtargetCount targetGenomeGeneLocus Najm 2018-Score Out-of-Frame-Score
+
                     } elseif (count($tmparray) > 1) { # SaCas9
 
                         $Xu_Score = '--';
@@ -1014,13 +960,9 @@ class AscrisprController extends Controller
                 if ($offtargetCount == "None" || $offtargetCount == "-1" || $offtargetCount == "--" || $offtargetCount == "") {
                     $offtargetCount = "0-0-0-0";
                 } else {
-//                        $offtargetCount = "<a href='ascrispr/offtargetsInfo/$spacerSeq_original/$PAM_original/$time_stamp/$str_for_link' target='_blank'>$mismatchCount_num_str </a>";
+
                     $offtargetCount = $mismatchCount_num_str;
                 }
-
-//                    $str_for_link = "$PAMSeq:$Targeting_Strand:$Direction_link:$N1:$N2:$spacerStart:$spacerEnd:$PAMStart:$PAMEnd:$MUTposStart:$MUTposEnd:$crispr_system:$PAM_IUB:$time_stamp:$seq_name_hide";
-//                    $Enzyme_Information = "<a href='ascrispr/enzymeInformation/$spacerSeq/$PAM_original/$str_for_link' target='_blank'>$Enzyme_Information </a>";
-
                 $data_out[$i][$j]['spacerSeq_original'] = $spacerSeq_original;
                 $data_out[$i][$j]['PAM_original'] = $PAM_original;
                 $data_out[$i][$j]['Direction_link'] = $Direction_link;
@@ -1034,7 +976,6 @@ class AscrisprController extends Controller
                 $data_out[$i][$j]['MUTposEnd'] = $MUTposEnd;
                 $data_out[$i][$j]['PAM_IUB'] = $PAM_IUB;
                 $data_out[$i][$j]['seq_name_hide'] = $seq_name_hide;
-
                 $data_out[$i][$j]['spacerSeq'] = $spacerSeq;
                 $data_out[$i][$j]['PAMSeq'] = $PAMSeq;
                 $data_out[$i][$j]['Crispr_Type'] = $Crispr_Type;
@@ -1058,13 +999,11 @@ class AscrisprController extends Controller
                 $data_out[$i][$j]['spacerSeq_TTTT_tip'] = $spacerSeq_TTTT_tip;
                 $data_out[$i][$j]['seqId'] = $seqId;
                 $data_out[$i][$j]['guideId'] = $guideId;
-
                 $j = $j + 1;
 
             }
         }
         return $data_out;
-//        return '123';
     }
 
     public function showInfoSequence(Request $request)
@@ -1128,7 +1067,6 @@ class AscrisprController extends Controller
             $seq_name_hide = $seqs_list[$i]["seq_name"];
             $input_seq = $seqs_list[$i]["input_seq"];
 
-            # 判断是否在运行
             $PAMs_array = $PAMs;//explode(",", $PAMs);
             $PAMs_array_len = count($PAMs_array);
 
@@ -1170,9 +1108,9 @@ class AscrisprController extends Controller
                     $param1 = " -in " . $in . " -out " . $out . " -crispr_system " . $crispr_system . " -PAMs " . $PAMs_str
                         . " -seq_name ". $seq_name_hide. " -input_types ". $input_types. " -seedLength ". $seedLength. " -is_offtarget ". $offtarget;
 
-                    exec("perl /var/www/ascrispr_backend/public/bin/gh_ascrisprA.pl" . $param1 . " >> " . "$upload_dir/gh_ascrisprA.log 2>&1");
+                    exec("perl /software_path/gh_ascrisprA.pl" . $param1 . " >> " . "$upload_dir/gh_ascrisprA.log 2>&1");
                     $log_file = $time_stamp.'/showInfoSequence_gh_ascrisprA_log.txt';
-                    $cmd = "perl /var/www/ascrispr_backend/public/bin/gh_ascrisprA.pl" . $param1 . " >> " . "$upload_dir/gh_ascrisprA.log 2>&1";
+                    $cmd = "perl /software_path/gh_ascrisprA.pl" . $param1 . " >> " . "$upload_dir/gh_ascrisprA.log 2>&1";
                     Storage::disk('uploads')->put($log_file, $cmd);
                 }
             }
@@ -1201,7 +1139,6 @@ class AscrisprController extends Controller
                     $data_out[$i][$j]['MUTposEnd'] = '';
                     $data_out[$i][$j]['PAM_IUB'] = '';
                     $data_out[$i][$j]['seq_name_hide'] = '';
-
                     $data_out[$i][$j]['spacerSeq'] = '';
                     $data_out[$i][$j]['PAMSeq'] = '';
                     $data_out[$i][$j]['Crispr_Type'] = '';
@@ -1265,7 +1202,6 @@ class AscrisprController extends Controller
                     }
 
                     $str_for_link = "$PAMSeq:$Targeting_Strand:$Direction_link:$N1:$N2:$spacerStart:$spacerEnd:$PAMStart:$PAMEnd:$MUTposStart:$MUTposEnd:$crispr_system:$PAM_IUB:$time_stamp:$seq_name_hide";
-//                    $Enzyme_Information = "<a href='ascrispr/enzymeInformation/$spacerSeq/$PAM_original/$str_for_link' target='_blank'>$Enzyme_Information <span class='glyphicon glyphicon-new-window'></span></a>";
 
                     $isSNP_PAM = FALSE;
                     if ($Targeting_Strand == "Varied" || $Targeting_Strand == "Alternative") {
@@ -1283,8 +1219,7 @@ class AscrisprController extends Controller
                                     $isSNP_PAM = TRUE;
                                 }
                             } else {
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在spacer上有四种情况，不可以合并为三种
+
                                 if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $spacerStart + 1;
@@ -1303,8 +1238,6 @@ class AscrisprController extends Controller
                                     $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                                 }
 
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在PAM上有四种情况，不可以合并为三种
                                 if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $PAMStart + 1;
@@ -1344,8 +1277,6 @@ class AscrisprController extends Controller
                                 }
                             } else {
 
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在spacer上有四种情况，不可以合并为三种
                                 if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $spacerStart + 1;
@@ -1364,8 +1295,6 @@ class AscrisprController extends Controller
                                     $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                                 }
 
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在PAM上有四种情况，不可以合并为三种
                                 if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $PAMStart + 1;
@@ -1412,8 +1341,6 @@ class AscrisprController extends Controller
                                     $isSNP_PAM = TRUE;
                                 }
                             } else {
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在spacer上有四种情况，不可以合并为三种
                                 if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $spacerStart + 1;
@@ -1431,8 +1358,7 @@ class AscrisprController extends Controller
                                     $len = $spacerEnd - $spacerStart + 1;
                                     $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                                 }
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在PAM上有四种情况，不可以合并为三种
+
                                 if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $PAMStart + 1;
@@ -1469,8 +1395,6 @@ class AscrisprController extends Controller
                                     $isSNP_PAM = TRUE;
                                 }
                             } else {
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在spacer上有四种情况，不可以合并为三种
                                 if ($MUTposStart < $spacerStart && $MUTposEnd >= $spacerStart && $MUTposEnd <= $spacerEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $spacerStart + 1;
@@ -1489,8 +1413,6 @@ class AscrisprController extends Controller
                                     $spacerSeq = $this -> mark_pos($spacerSeq, $posStart, $len);
                                 }
 
-                                # 相对位置 变为 绝对位置， 0表示从seq的头部开始
-                                # Mutation 在PAM上有四种情况，不可以合并为三种
                                 if ($MUTposStart < $PAMStart && $MUTposEnd >= $PAMStart && $MUTposEnd <= $PAMEnd) {
                                     $posStart = 0;
                                     $len = $MUTposEnd - $PAMStart + 1;
@@ -1524,7 +1446,6 @@ class AscrisprController extends Controller
                         }
                     }
                     # variant in PAM， type is N R ...
-//                    if ($Targeting_Strand == "Reference" || $Targeting_Strand == "WT") {
                         if (strlen($PAMSeq) > strlen($PAM_original)) {
                             if ($isSNP_PAM) {
                                 if(strlen($N1)==1 && strlen($N2)==1) {
@@ -1537,8 +1458,6 @@ class AscrisprController extends Controller
                                 }
                             }
                         }
-//                    }
-
 
                     # TTTT
                     $spacerSeq_TTTT_tip = $this -> mark_pos_tttt($spacerSeq);
@@ -1639,28 +1558,8 @@ class AscrisprController extends Controller
                             }
 
                             $Najm2018 = '--';
-//                            if ($ele[28] !== 'NotEnoughFlankSeq'){
-//                                $Doench16_Score = $ele[28] / 100;
-//                            }
-//
-//                            $Doench16_Old_Score = $ele[29];
-//                            $Chari_Score = $ele[30];
-//
-//                            $Xu_Score = $ele[31];
-//
-//                            $Xu_Score = round(1 / (1 + pow(M_E, -$Xu_Score)), 2);
-//
-//                            $Doench14_Score = $ele[32];
-//                            $Wang_Score = $ele[33];
-//                            $Moreno_Mateos_Score = $ele[34] / 100;
-//                            $Azimuth_in_vitro_Score = $ele[35] / 100;
-//                            $Najm2018 = '--';
-//                            $CCTop_Score = $ele[36];
-//                            $Out_of_Frame_Score = $ele[37];
-//                            $targetGenomeGeneLocus = $ele[39];
-
                             $targetGenomeGeneLocusTmp = str_replace(PHP_EOL, '', $ele[39]);
-                            // #seqId guideId targetSeq mitSpecScore offtargetCount targetGenomeGeneLocus Najm 2018-Score Out-of-Frame-Score
+
                         } elseif (count($tmparray) > 1) { # SaCas9
 
                             $Xu_Score = '--';
@@ -1714,7 +1613,6 @@ class AscrisprController extends Controller
                     $data_out[$i][$j]['MUTposEnd'] = $MUTposEnd;
                     $data_out[$i][$j]['PAM_IUB'] = $PAM_IUB;
                     $data_out[$i][$j]['seq_name_hide'] = $seq_name_hide;
-
                     $data_out[$i][$j]['spacerSeq'] = $spacerSeq;
                     $data_out[$i][$j]['PAMSeq'] = $PAMSeq;
                     $data_out[$i][$j]['Crispr_Type'] = $Crispr_Type;
