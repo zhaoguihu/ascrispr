@@ -1,0 +1,126 @@
+body {
+    color: #555;
+    background: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    font-size: 18px;
+    line-height: 2;
+}
+
+.el-header {
+    background-color: #545c64;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    line-height: 60px;
+    position: fixed;
+    /*top: 0;*/
+    width: 100%;
+    z-index: 9;
+}
+
+.el-footer {
+    background-color: #545c64;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    line-height: 60px;
+}
+
+/*.el-main {*/
+/*background-color: #ecf2f4;*/
+/*!*color: #fff;*!*/
+/*font-size: 18px;*/
+/*text-align: left;*/
+/*width: 100%;*/
+/*margin-top: 45px;*/
+/*!*min-height: 36px;*!*/
+/*}*/
+
+.grid-content {
+    /*border-radius: 4px;*/
+    /*min-height: 36px;*/
+    /*position: relative;*/
+    padding: 1% 0% 1% 0%;
+
+}
+
+.banner {
+    padding: 0% 0% 0% 0%;
+    width: 100%;
+    background-color: #ecf2f4;
+    /*color: #D8A406;*/
+    margin-top: 45px;
+    /*border-radius: 4px;*/
+    min-height: 36px;
+}
+
+.bg-white {
+    background: #ffffff;
+}
+
+.bg-light {
+    background: #ecf2f4;
+}
+
+
+
+/*.post-header-image {*/
+    /*width: 100%;*/
+    /*max-height: 450px;*/
+    /*background-size: cover;*/
+    /*background-position: center;*/
+    /*min-height: 300px;*/
+/*}*/
+
+/*@media screen and (min-width: 1100px) {*/
+    /*.post-header-image {*/
+        /*max-height: 450px;*/
+        /*min-height: 400px;*/
+    /*}*/
+/*}*/
+
+/*!* 3.4.1 Site Header *!*/
+/*.site-header {*/
+    /*padding: 0;*/
+/*}*/
+/*!* Theme Options - Site Header Logo *!*/
+/*#site-logo {*/
+    /*display: inline-block;*/
+    /*float: left;*/
+    /*margin: 0 20px 20px 0;*/
+    /*margin: 0 1.714285714rem 1.714285714rem 0;*/
+/*}*/
+
+/*#site-header {*/
+    /*float: none;*/
+    /*padding-top: 0px;*/
+    /*!*padding-top: 0.857142857rem;*!*/
+/*}*/
+/*.site-header h1,*/
+/*.site-header h2 {*/
+    /*text-align: left;*/
+/*}*/
+/*.site-header h1 a,*/
+/*.site-header h2 a {*/
+    /*color: #515151;*/
+    /*display: inline-block;*/
+    /*text-decoration: none;*/
+/*}*/
+/*.site-header h1 a:hover,*/
+/*.site-header h2 a:hover {*/
+    /*color: #21759b;*/
+/*}*/
+/*.site-header h1 {*/
+    /*font-size: 20px;*/
+    /*!*font-size: 1.714285714rem;*!*/
+    /*!*line-height: 1.285714286;*!*/
+    /*margin-bottom: 10px;*/
+    /*margin-bottom: 1rem;*/
+/*}*/
+/*.site-header h2 {*/
+    /*font-weight: normal;*/
+    /*font-size: 18px;*/
+    /*!*font-size: 0.928571429rem;*!*/
+    /*!*line-height: 1.846153846;*!*/
+    /*color: #757575;*/
+/*}*/
